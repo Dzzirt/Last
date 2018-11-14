@@ -58,7 +58,7 @@ public class Contacts {
     private static int countContacts(HashSet<String> contacts, String query) {
         int queriedContactsCount = 0;
         for (String contact : contacts) {
-            if (contact.contains(query)) {
+            if (contact.startsWith(query)) {
                 queriedContactsCount++;
             }
         }
