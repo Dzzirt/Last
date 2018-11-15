@@ -1,5 +1,6 @@
 import java.io.*;
 import java.sql.SQLOutput;
+import java.util.ArrayList;
 
 //Elapsed time - 1 hour
 
@@ -19,42 +20,39 @@ public class WordDistanceFinder {
 
             BufferedReader fileReader = new BufferedReader(new FileReader(TEXT_FILE_NAME));
 
-            int firstWordPos = -1;
             int minDistance = -1;
             int maxDistance = -1;
 
-            String firstWord = null;
-            String secondWord = null;
+            ArrayList<Integer> oneWordIndexes = new ArrayList<>();
+            ArrayList<Integer> anotherWordIndexes = new ArrayList<>();
 
-            long start = System.currentTimeMillis();
             //Read file by line in memory usage reasons
             String line;
             while ((line = fileReader.readLine()) != null) {
                 String[] words = line.split(" ");
                 for (int i = 0; i < words.length; i++) {
-                    // Define the words order
-                    if (firstWord == null && secondWord == null) {
-                        if (words[i].equals(oneWord)) {
-                            firstWord = oneWord;
-                            secondWord = anotherWord;
-                        } else if (words[i].equals(anotherWord)) {
-                            firstWord = anotherWord;
-                            secondWord = oneWord;
-                        }
-                        firstWordPos = i;
-                    }
-                    // Calculate min and max distance if second word has found
-                    if (words[i].equals(secondWord)) {
-                        if (minDistance == NONE) {
-                            minDistance = i - firstWordPos - 1;
-                        } else {
-                            maxDistance = i - firstWordPos - 1;
-                        }
+                    if (words[i].equals(oneWord)) {
+                        oneWordIndexes.add(i);
+                    } else if (words[i].equals(anotherWord)) {
+                        anotherWordIndexes.add(i);
                     }
                 }
-                // Max and min distance are equal if second word isn't repeat
-                if (maxDistance == NONE) {
-                    maxDistance = minDistance;
+            }
+
+            for (Integer oneIndex : oneWordIndexes) {
+                for (Integer anotherIndex : anotherWordIndexes) {
+                    int distance = Math.abs(anotherIndex - oneIndex) - 1;
+                    if (minDistance < 0 && maxDistance < 0) {
+                        minDistance = distance;
+                        maxDistance = distance;
+                    }
+
+                    if (distance < minDistance) {
+                        minDistance = distance;
+                    }
+                    if (distance > maxDistance) {
+                        maxDistance = distance;
+                    }
                 }
             }
 
@@ -66,9 +64,6 @@ public class WordDistanceFinder {
                 System.out.println("Min distance: " + minDistance);
                 System.out.println("Max distance: " + maxDistance);
             }
-
-            System.out.println(System.currentTimeMillis() - start);
-
 
         } catch (IOException e) {
             e.printStackTrace();
